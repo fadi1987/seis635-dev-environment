@@ -24,7 +24,7 @@ Vagrant.configure(vagrant_api_version) do |config|
       machine.vm.hostname = hostname
       machine.vm.network 'public_network', bridge: info[:network]
       machine.vm.provision 'file', source: 'config', destination: '/home/vagrant/config' 
-      machine.vm.provision 'shell', inline: info[:script_path] if info[:script_path]
+      machine.vm.provision 'shell', privileged: true, path: info[:script_path] if info[:script_path]
 
       machine.vm.provider 'hyperv' do |hv|
         hv.vmname = info[:vmname]
