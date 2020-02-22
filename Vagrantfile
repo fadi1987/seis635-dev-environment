@@ -2,7 +2,7 @@ vagrant_api_version = '2'
 machines = {
   seis635: {
     box: 'estenrye/ubuntu-desktop',
-    box_version : '1804.20190312.0'
+    box_version: '1804.20190312.0',
     cpus: 2,
     mem: 4096,
     vmname: 'seis-635',
