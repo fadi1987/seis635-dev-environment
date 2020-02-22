@@ -1,0 +1,60 @@
+---
+  - name: Install Open JDK 8
+    package:
+      name: openjdk-8-jre-headless
+      state: present
+    become: yes
+  
+  - name: Install Eclipse
+    snap:
+      classic: yes
+      name: eclipse
+
+  - name: Install Guake
+    package:
+      name: guake
+      state: present
+  
+  - name: Install zsh
+    package:
+      name: zsh
+      state: present
+
+  - name: Install git
+    package:
+      name: git
+      state: present
+
+  - name: Make zsh my default shell
+    user:
+      name: vagrant
+      shell: /usr/bin/zsh
+
+  - name: Run the Oh-My-Zsh installer
+    become_user: "vagrant"
+    shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    args:
+      creates: "/home/vagrant/.oh-my-zsh"
+  
+  - name: Set the theme to pygmalion
+    lineinfile:
+      path: "/home/vagrant/.zshrc"
+      regexp: '^ZSH_THEME='
+      line: 'ZSH_THEME="pygmalion"'
+  
+  - name: make sure autostart directiory is present
+    file:
+      name: /home/vagrant/.config/autostart
+      state: directory
+  
+  - name: copy Startup applications
+    copy:
+      src: "{{ role_path }}/files/{{ item }}"
+      dest: /home/vagrant/.config/autostart/{{ item }}
+    with_items:
+      - guake.desktop
+
+  - name: upgrade packages -- Last Step, will take a while.  VM can be used now.
+    apt:
+      update_cache: yes
+      upgrade: yes
