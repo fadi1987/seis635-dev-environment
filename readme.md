@@ -18,7 +18,7 @@ Files saved to /opt/data will be preserved on the host machine.
 
 Prerequisites:
   - Hyper-V
-  - Vagrant
+  - [Vagrant](https://www.vagrantup.com/downloads.html)
 
 ```powershell
 vagrant up
