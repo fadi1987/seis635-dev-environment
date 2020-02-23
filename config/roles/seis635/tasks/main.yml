@@ -25,13 +25,42 @@
       name: git
       state: present
 
-  - name: Make zsh my default shell
-    user:
-      name: vagrant
-      shell: /usr/bin/zsh
+  - name: Install ca-certificates
+    package:
+      name: ca-certificates
+      state: present
+
+  - name: Install curl
+    package:
+      name: curl
+      state: present
+
+  - name: ensure .config directiory is present
+    file:
+      name: /home/vagrant/.config
+      state: directory
+      owner: vagrant
+      group: vagrant
+
+  - name: make sure autostart directiory is present
+    file:
+      name: /home/vagrant/.config/autostart
+      state: directory
+      owner: vagrant
+      group: vagrant
+
+  - name: copy Startup applications
+    copy:
+      src: "{{ role_path }}/files/{{ item }}"
+      dest: /home/vagrant/.config/autostart/{{ item }}
+      owner: vagrant
+      group: vagrant
+    with_items:
+      - guake.desktop
 
   - name: Run the Oh-My-Zsh installer
-    become_user: "vagrant"
+    become_user: vagrant
+    become: yes
     shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     args:
       creates: "/home/vagrant/.oh-my-zsh"
@@ -40,21 +69,23 @@
     lineinfile:
       path: "/home/vagrant/.zshrc"
       regexp: '^ZSH_THEME='
-      line: 'ZSH_THEME="pygmalion"'
+      line: 'ZSH_THEME="pygmalion"'  
   
-  - name: make sure autostart directiory is present
-    file:
-      name: /home/vagrant/.config/autostart
-      state: directory
-  
-  - name: copy Startup applications
-    copy:
-      src: "{{ role_path }}/files/{{ item }}"
-      dest: /home/vagrant/.config/autostart/{{ item }}
-    with_items:
-      - guake.desktop
+  - name: Reset guake settings
+    become_user: vagrant
+    become: yes
+    shell: dbus-launch dconf reset -f /apps/guake/
+    args:
+      creates: /home/vagrant/.guake-reset
 
-  - name: upgrade packages -- Last Step, will take a while.  VM can be used now.
-    apt:
-      update_cache: yes
-      upgrade: yes
+  - name: Load guake settings
+    become_user: vagrant
+    become: yes
+    shell: dbus-launch dconf load /apps/guake/ < "{{ role_path }}/files/apps-guake.dconf"
+    args:
+      creates: /home/vagrant/.guake-load
+
+  # - name: upgrade packages -- Last Step, will take a while.  VM can be used now.
+  #   apt:
+  #     update_cache: yes
+  #     upgrade: yes
