@@ -14,6 +14,14 @@ Installed features:
 The Vagrant file is configured to automatically mount the data folder to /opt/data.
 Files saved to /opt/data will be preserved on the host machine.
 
+## Configuring Hyper-V
+
+```powershell
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
+[System.Environment]::SetEnvironmentVariable('VAGRANT_DEFAULT_PROVIDER', 'hyperv', 'user')
+$env:VAGRANT_DEFAULT_PROVIDER = 'hyperv'
+```
+
 ## How to run
 
 Prerequisites:
