@@ -3,3 +3,6 @@
   connection: local
   roles:
     - seis635
+    - role: gantsign.maven
+      maven_version: 3.6.3
+      maven_is_default_installation: yes
