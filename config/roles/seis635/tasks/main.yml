@@ -1,7 +1,7 @@
 ---
   - name: Install Open JDK 8
     package:
-      name: openjdk-8-jre-headless
+      name: openjdk-8-jdk
       state: present
     become: yes
   
@@ -70,7 +70,9 @@
       path: "/home/vagrant/.zshrc"
       regexp: '^ZSH_THEME='
       line: 'ZSH_THEME="pygmalion"'  
-  
+    become_user: vagrant
+    become: yes
+    
   - name: Reset guake settings
     become_user: vagrant
     become: yes
@@ -84,6 +86,37 @@
     shell: dbus-launch dconf load /apps/guake/ < "{{ role_path }}/files/apps-guake.dconf"
     args:
       creates: /home/vagrant/.guake-load
+
+  - name: make sure gradel directiory is present
+    file:
+      name: /opt/gradle
+      state: directory
+      owner: vagrant
+      group: vagrant
+
+  - name: download Gradle
+    unarchive:
+      src: https://downloads.gradle-dn.com/distributions/gradle-6.2.1-bin.zip
+      remote_src: yes
+      dest: /opt/gradle
+      owner: vagrant
+      group: vagrant
+  
+  - name: Set GRADLE_HOME
+    lineinfile:
+      path: "/home/vagrant/.zshrc"
+      regexp: '^GRADLE_HOME='
+      line: 'GRADLE_HOME="/opt/gradle/gradle-6.2.1"'
+    become_user: vagrant
+    become: yes
+
+  - name: Set PATH
+    lineinfile:
+      path: "/home/vagrant/.zshrc"
+      regexp: '^PATH='
+      line: 'PATH=${GRADLE_HOME}/bin:${PATH}'
+    become_user: vagrant
+    become: yes
 
   # - name: upgrade packages -- Last Step, will take a while.  VM can be used now.
   #   apt:
